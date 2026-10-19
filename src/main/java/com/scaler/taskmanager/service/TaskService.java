@@ -3,6 +3,8 @@ package com.scaler.taskmanager.service;
 import com.scaler.taskmanager.entities.TaskEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -13,12 +15,15 @@ public class TaskService {
     // First task's id will be 1.
     private int taskId = 1;
 
-    public TaskEntity addTask(String title, String description, String deadline) {
+    // To convert the format of given String before converting it to Date.
+    private final SimpleDateFormat deadlineFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
+    public TaskEntity addTask(String title, String description, String deadline) throws ParseException {
         TaskEntity task = new TaskEntity();
         task.setId(taskId++);
         task.setTitle(title);
         task.setDescription(description);
-        task.setDeadline(new Date(deadline)); // To do: validate date format YYYY-MM-DD
+        task.setDeadline(deadlineFormatter.parse(deadline));
         task.setCompleted(false);
         tasks.add(task);
         return task;
@@ -34,5 +39,22 @@ public class TaskService {
             }
         }
         return null;
+    }
+
+    public TaskEntity updateTask(int id, String description, String deadline, Boolean completed) throws ParseException {
+        TaskEntity task = getTaskById(id);
+        if (task == null) {
+            return null;
+        }
+        if (description != null) {
+            task.setDescription(description);
+        }
+        if (deadline != null) {
+            task.setDeadline(deadlineFormatter.parse(deadline));
+        }
+        if (completed != null) {
+            task.setCompleted(completed);
+        }
+        return task;
     }
 }
